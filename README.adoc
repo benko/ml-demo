@@ -74,10 +74,10 @@ A couple of great types of models to start learning with are regression (predict
 
 The data you need for those is typically very different. Try figuring out why and what kind of models a certain type of data supports well.
 
-* CASAS-HAR (Human Activity Recognition from Continuous Ambient Sensor Data) is a very flexible regression dataset.
-* MNIST handwritten numbers and fashion items datasets are a great start for classification.
-
 Nowadays, https://www.kaggle.com/datasets[Kaggle] has some great example datasets (requires a free account).
+
+* https://casas.wsu.edu/datasets/[CASAS-HAR] (Human Activity Recognition from Continuous Ambient Sensor Data) is a very flexible regression dataset (available for https://www.kaggle.com/datasets/utkarshx27/ambient-sensor-based-human-activity-recognition[download from Kaggle]).
+* MNIST has two excellent classification datasets: handwritten numbers and fashion items - they are a great start for classification - almost every framework includes them. Both are also available at Kaggle - https://www.kaggle.com/datasets/hojjatk/mnist-dataset[numbers] and https://www.kaggle.com/datasets/zalando-research/fashionmnist[fashion].
 
 == Getting Running ==
 
