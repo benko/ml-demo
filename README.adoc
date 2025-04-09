@@ -110,19 +110,11 @@ Obtain an activation script that is not embedded into your `bashrc`:
 
 [subs="+quotes"]
 ----
-$ *mv .bash_profile{,-backup}*
-$ *touch .bash_profile*
+$ *mv ~/.bash_profile{,-backup}*
+$ *touch ~/.bash_profile*
 $ *mamba init bash*
 no change     /opt/miniforge/condabin/conda
-no change     /opt/miniforge/bin/conda
-no change     /opt/miniforge/bin/conda-env
-no change     /opt/miniforge/bin/activate
-no change     /opt/miniforge/bin/deactivate
-no change     /opt/miniforge/etc/profile.d/conda.sh
-no change     /opt/miniforge/etc/fish/conf.d/conda.fish
-no change     /opt/miniforge/shell/condabin/Conda.psm1
-no change     /opt/miniforge/shell/condabin/conda-hook.ps1
-no change     /opt/miniforge/lib/python3.12/site-packages/xontrib/conda.xsh
+...
 no change     /opt/miniforge/etc/profile.d/conda.csh
 modified      /foo/bar/.bash_profile
 
@@ -132,8 +124,8 @@ Added mamba to /foo/bar/.bash_profile
 
 ==> For changes to take effect, close and re-open your current shell. <==
 
-$ *(echo '#!/bin/false'; cat .bash_profile) > conda-init.sh*
-$ *mv .bash_profile{-backup,}*
+$ *(echo '#!/bin/false'; cat ~/.bash_profile) > conda-init.sh*
+$ *mv ~/.bash_profile{-backup,}*
 ----
 
 For activation a any time, source the script:
@@ -276,7 +268,9 @@ If you want to later update some of the environment components, you can do so by
 (sklearn-16) $ *mamba env update -f ./env-sklearn-16.yml*
 ----
 +
+====
 WARNING: `env update` is always applied to _current_ environment.
+====
 
 You can do the same with other environments: PyTorch, TensorFlow, etc. These may even come with hardware acceleration support for your computer system.
 
