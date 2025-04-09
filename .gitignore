@@ -1,0 +1,5 @@
+.ipynb_checkpoints
+.*.sw?
+.DS_Store
+WineQT.csv
+conda-init.sh

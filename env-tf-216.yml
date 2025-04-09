@@ -1,0 +1,15 @@
+---
+name: tensorflow-2.16
+channels:
+  - apple
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - numpy>=1.19.5
+  - pandas>=1.1.5
+  - matplotlib>=3.3.4
+  - tensorflow-deps
+  - pip>=25.0
+  - pip:
+    - tensorflow-macos
+    - tensorflow-metal
