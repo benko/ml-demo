@@ -18,7 +18,7 @@ Just looking at Python's most popular ML frameworks:
 
 Additionally, https://keras.io/[Keras] is a multi-framework ML frontend that can work with TensorFlow, PyTorch, SciKit-Learn, JAX, and others.
 
-The problem is this is the middle layer nowadays, not even the topmost any more.
+The challenge is this is the middle layer nowadays, not even the topmost any more.
 
 These frameworks all come with their own tools to make the jobs of working with data and training models easier:
 
@@ -64,7 +64,9 @@ MLOps is another can of worms:
 * https://www.kubeflow.org/[KubeFlow] for Kubernetes-related integrations (included in RHOAI)
 * https://github.com/elyra-ai/elyra[Elyra], integrating with JupyterLab Notebooks
 
-Don't worry - start small and when the sandbox becomes too small, look around to see what can extend it.
+Don't worry - start small and when you outgrow the sandbox, look at your project and listen to what sounds like the most interesting direction to go in at the moment, and then look around to see what tools you can learn about to expand.
+
+We all needed years to get our sense of direction in this story. There are no shortcuts, just fun along the way.
 
 === Get Some Samples ===
 
@@ -76,8 +78,8 @@ The data you need for those is typically very different. Try figuring out why an
 
 Nowadays, https://www.kaggle.com/datasets[Kaggle] has some great example datasets (requires a free account).
 
-* https://casas.wsu.edu/datasets/[CASAS-HAR] (Human Activity Recognition from Continuous Ambient Sensor Data) is a very flexible regression dataset (available for https://www.kaggle.com/datasets/utkarshx27/ambient-sensor-based-human-activity-recognition[download from Kaggle]).
-* MNIST has two excellent classification datasets: handwritten numbers and fashion items - they are a great start for classification - almost every framework includes them. Both are also available at Kaggle - https://www.kaggle.com/datasets/hojjatk/mnist-dataset[numbers] and https://www.kaggle.com/datasets/zalando-research/fashionmnist[fashion].
+* https://www.nist.gov/el/ammt-temps/datasets[NIST] has two excellent image classification datasets: handwritten numbers and fashion items - they are a great start for classification - almost every framework includes them. Both are also available at Kaggle - https://www.kaggle.com/datasets/hojjatk/mnist-dataset[numbers] and https://www.kaggle.com/datasets/zalando-research/fashionmnist[fashion].
+* https://casas.wsu.edu/datasets/[CASAS] has a _Human Activity Recognition from Continuous Ambient Sensor Data_ dataset - it is a very flexible regression dataset offering tons of opportunities (available for https://www.kaggle.com/datasets/utkarshx27/ambient-sensor-based-human-activity-recognition[download from Kaggle]).
 
 == Getting Running ==
 
@@ -335,7 +337,7 @@ JupyterLab Notebooks were designed to resolve those problems by being something 
 
 Not only that - you can define different Python kernels which belong to various Conda environments, in the same JupyterLab instance, and simply associate your notebooks with the kernel they need, so that they can run in whichever environment you want them to.
 
-If you want to use themm, the best way to do it is to install `jupyterlab` into the base environment.
+If you want to use them, the best way to do it is to install `jupyterlab` into the base environment.
 
 [subs="+quotes"]
 ----
