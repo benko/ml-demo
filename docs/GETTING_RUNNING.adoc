@@ -61,7 +61,7 @@ Preparing transaction: done
 Verifying transaction: done
 Executing transaction: done
 ----
-+
+
 ====
 WARNING: It is not recommended to update Conda solely based on a prompt that a newer version is available. Consult the Conda website and verify it is considered stable before doing an update.
 ====
@@ -130,7 +130,7 @@ dependencies:
   - scikit-learn>=1.6.1,<1.7.0
 ...
 ----
-+
+
 ====
 IMPORTANT: I suggest you initially use semantic version spec only for the components you really care about (such as Python and SciKit-Learn), and let Conda figure out the other component versions. After that, you can look at what is installed using `pip list installed` and update the versions in the environment file to reflect your system. This will ensure that repeated installations will use the same component versions, thus giving you predictable behaviour.
 ====
