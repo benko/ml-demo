@@ -1,0 +1,357 @@
+== Getting Running ==
+
+Create a system-independent Python installation. Trust me, you want to divorce Python from your system.
+
+So many frameworks and libraries have certain expectations as to what Python version you should be using, that if you want to switch between them without containerised versions, the best way is to create several independent installations.
+
+https://conda-forge.org[Conda-Forge] is a community GitHub organisation containing repositories of https://conda.org[Conda] recipes.
+
+Conda is a _"language-agnostic, multi-platform package management ecosystem for projects"_.
+
+Conda installer is called https://conda-forge.org/download/[Miniforge].
+
+It will help you maintain several independent environments, each with its own set of Python modules.
+
+What's best, it uses cached versions of packages so no long download waits whenever you want to initialise a similar, but not quite the same, environment.
+
+Think of it as Python _virtualenv_ on steroids.
+
+=== Installing and Preparing Conda ===
+
+Fresh installation:
+
+[subs="+quotes"]
+----
+$ *mkdir /opt/miniforge*
+$ *bash ~/Downloads/Miniforge3-24.11.3-2-MacOSX-arm64.sh -b -f -p /opt/miniforge*
+----
+
+For updates:
+
+[subs="+quotes"]
+----
+$ *bash ~/Downloads/Miniforge3-24.11.3-2-MacOSX-arm64.sh -b -f -u -p /opt/miniforge*
+----
+
+It is also possible to update Conda from a running environment:
+
+[subs="+quotes"]
+----
+(base) $ *conda update -y -n base -c conda-forge conda*
+Channels:
+ - conda-forge
+ - apple
+Platform: osx-arm64
+
+...
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    conda-24.11.3              |   py39h2804cbe_0         899 KB  conda-forge
+    ------------------------------------------------------------
+                                           Total:         899 KB
+
+...
+
+Downloading and Extracting Packages:
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+----
++
+====
+WARNING: It is not recommended to update Conda solely based on a prompt that a newer version is available. Consult the Conda website and verify it is considered stable before doing an update.
+====
+
+Obtain an activation script that is not permanently embedded into your `bashrc`:
+
+[subs="+quotes"]
+----
+$ *[ -e ~/.bash_profile ] && mv ~/.bash_profile{,-backup}*
+$ *touch ~/.bash_profile*
+$ *mamba init bash*
+no change     /opt/miniforge/condabin/conda
+...
+no change     /opt/miniforge/etc/profile.d/conda.csh
+modified      /foo/bar/.bash_profile
+
+==> For changes to take effect, close and re-open your current shell. <==
+
+Added mamba to /foo/bar/.bash_profile
+
+==> For changes to take effect, close and re-open your current shell. <==
+
+$ *(echo '#!/bin/false'; cat ~/.bash_profile) > conda-init.sh*
+$ *[ -e ~/.bash_profile-backup ] && mv ~/.bash_profile{-backup,} || rm -f ~/.bash_profile*
+----
+
+For activation at any time, source the script:
+
+[subs="+quotes"]
+----
+$ *source conda-init.sh*
+(base) $ 
+----
+
+=== Creating a Conda Environment ===
+
+You can create any number of environments in Conda.
+
+Let's create the first one for SciKit-Learn in this section. PyTorch, and TensorFlow are described below, although essential steps are the same.
+
+Step one is always identifying the version of Python that the environment works best with, also in terms of all of its dependencies.
+
+Sometimes, the toolkit will suggest the steps for the package manager we chose (Conda). I propose you completely ignore this and just roll your own environment. It will be for the better once you hit some dependency issues (and you usually will) - you will at least be familiar with the components you chose and the process of replacing them and/or adding more.
+
+Check https://www.python.org/downloads/[Current Python Release Status]. As of the time of this writing, 3.13 was the latest non-pre-release version.
+
+Cross-check with https://scikit-learn.org/stable/install.html[latest stable SciKit-Learn release].
+
+Create an environment description, say `envs/env-sklearn-16.yml`.
+
+.An example SciKit-Learn environment specification file for Conda
+[source,yaml]
+----
+---
+name: sklearn-16
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.13,<3.14
+  - numpy
+  - cython
+  - pandas
+  - matplotlib
+  - seaborn
+  - scipy
+  - scikit-learn>=1.6.1,<1.7.0
+...
+----
++
+====
+IMPORTANT: I suggest you initially use semantic version spec only for the components you really care about (such as Python and SciKit-Learn), and let Conda figure out the other component versions. After that, you can look at what is installed using `pip list installed` and update the versions in the environment file to reflect your system. This will ensure that repeated installations will use the same component versions, thus giving you predictable behaviour.
+====
+
+Now tell `mamba` (or `conda`) to create it:
+
+[subs="+quotes"]
+----
+(base) $ *mamba env create -y -f ./envs/env-sklearn-16.yml*
+Channels:
+ - conda-forge
+Platform: osx-arm64
+Collecting package metadata (repodata.json): done
+Solving environment: done
+
+Downloading and Extracting Packages:
+...
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+...
+----
+
+Activate it (some checks along the way to show you how the entire thing works):
+
+[subs="+quotes"]
+----
+(base) $ *which python*
+/opt/miniforge/bin/python
+
+(base) $ *python --version*
+Python 3.12.9
+
+(base) $ *mamba env list*
+# conda environments:
+#
+base                 * /opt/miniforge
+sklearn-16             /opt/miniforge/envs/sklearn-16
+
+(base) $ *mamba activate sklearn-16*
+
+(sklearn-16) $ *which python*
+/opt/miniforge/envs/sklearn-16/bin/python
+
+(sklearn-16) $ *python --version*
+Python 3.13.2
+
+(sklearn-16) $ *python3*
+Python 3.13.2 | packaged by conda-forge | (main, Feb 17 2025, 14:02:48) [Clang 18.1.8 ] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+
+>>> *import sklearn*
+
+>>> *sklearn.show_versions()*
+
+System:
+    python: 3.13.2 | packaged by conda-forge | (main, Feb 17 2025, 14:02:48) [Clang 18.1.8 ]
+executable: /opt/miniforge/envs/sklearn-16/bin/python3
+   machine: macOS-15.4-arm64-arm-64bit-Mach-O
+
+Python dependencies:
+      sklearn: 1.6.1
+          pip: 25.0.1
+   setuptools: 78.1.0
+        numpy: 2.2.4
+        scipy: 1.15.2
+       Cython: 3.0.12
+       pandas: 2.2.3
+   matplotlib: 3.10.1
+       joblib: 1.4.2
+threadpoolctl: 3.6.0
+
+Built with OpenMP: True
+
+threadpoolctl info:
+       user_api: blas
+   internal_api: openblas
+    num_threads: 10
+         prefix: libopenblas
+       filepath: /opt/miniforge/envs/sklearn-16/lib/libopenblas.0.dylib
+        version: 0.3.29
+threading_layer: openmp
+   architecture: VORTEX
+
+       user_api: openmp
+   internal_api: openmp
+    num_threads: 10
+         prefix: libomp
+       filepath: /opt/miniforge/envs/sklearn-16/lib/libomp.dylib
+        version: None
+
+>>> *exit()*
+----
+
+If you want to later update some of the environment components, you can do so by editing the env file and issuing the following command:
+
+[subs="+quotes"]
+----
+(sklearn-16) $ *mamba env update -y -f ./env-sklearn-16.yml*
+...
+----
++
+====
+WARNING: Without the `-n` option, `env update` is always applied to _current_ environment.
+====
+
+=== Creating Other Environments ===
+
+You can do the same with other environments: PyTorch, TensorFlow, etc. Some of these may even come with hardware acceleration support for your computer system.
+
+.An example PyTorch environment specification file for Conda
+[source,yaml]
+----
+---
+name: pytorch-26
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.12,<3.13
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - pytorch>=2.6,<2.7
+...
+----
+
+[subs="+quotes"]
+----
+(base) $ *mamba env create -y -f ./env-pytorch-26.yml*
+...
+----
+
+.An example TensorFlow environment specification file for Conda
+[source,yaml]
+----
+---
+name: tf-216
+channels:
+  - apple
+  - conda-forge
+dependencies:
+  - python>=3.9
+  - numpy>=1.19.5
+  - pandas>=1.1.5
+  - matplotlib>=3.3.4
+  - tensorflow-deps
+  - pip>=25.0
+  - pip:
+    - tensorflow-macos
+    - tensorflow-metal
+...
+----
+
+[subs="+quotes"]
+----
+(base) $ *mamba env create -y -f ./env-tf-216.yml*
+...
+----
+
+====
+NOTE: Unlike those in the listings above, the included environment specification files already contain all the relevant components and their versions.
+====
+
+=== Working With Environments ===
+
+Outside of an integrated environment such as VSCode and JupyterLab, you can use the `mamba` or `conda` command to inspect and switch between environments.
+
+[subs="+quotes"]
+----
+(base) $ *mamba env list*
+
+# conda environments:
+#
+base                 * /opt/miniforge
+pytorch-26             /opt/miniforge/envs/pytorch-26
+sklearn-16             /opt/miniforge/envs/sklearn-16
+tf-216                 /opt/miniforge/envs/tf-216
+
+(base) $ *conda env list*
+
+# conda environments:
+#
+base                 * /opt/miniforge
+pytorch-26             /opt/miniforge/envs/pytorch-26
+sklearn-16             /opt/miniforge/envs/sklearn-16
+tf-216                 /opt/miniforge/envs/tf-216
+----
+
+You can switch between them by using the `activate` and `deactivate` commands.
+
+[subs="+quotes"]
+----
+(base) $ *mamba activate sklearn-16*
+
+(sklearn-16) $ *mamba env list*
+
+# conda environments:
+#
+base                   /opt/miniforge
+pytorch-26             /opt/miniforge/envs/pytorch-26
+sklearn-16           * /opt/miniforge/envs/sklearn-16
+tf-216                 /opt/miniforge/envs/tf-216
+
+(sklearn-16) $ *mamba deactivate*
+
+(base) $
+----
+
+You can remove any environment using the `env remove` command.
+
+[subs="+quotes"]
+----
+(base) $ *mamba env remove -y -n pytorch-26*
+
+Remove all packages in environment /opt/miniforge/envs/pytorch-26:
+
+...
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+----

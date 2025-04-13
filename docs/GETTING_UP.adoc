@@ -1,0 +1,82 @@
+== Getting Up ==
+
+=== First Things First ===
+
+You want to at least get the terminology right. Use a reference such as https://www.manning.com/books/deep-learning-with-python-third-edition[_"Deep Learning with Python"_ by François Chollet], specifically chapter 1, _"What is Deep Learning?"_
+
+You want to understand how the technology works. From the same book, chapter 2, _"The Mathematical Building Blocks of Neural Networks"_ does a great job at explaining it without too much academic distraction.
+
+=== Get a Look at the Landscape ===
+
+There are so many different layers of projects, tools, and libraries.
+
+Just looking at Python's most popular ML frameworks:
+
+* https://scikit-learn.org/stable/index.html[SciKit Learn]
+* https://pytorch.org/[PyTorch]
+* https://www.tensorflow.org/[TensorFlow]
+
+Additionally, https://keras.io/[Keras] is a multi-framework ML frontend that can work with TensorFlow, PyTorch, SciKit-Learn, JAX, and others.
+
+The challenge is this is the middle layer nowadays, not even the topmost any more.
+
+These frameworks all come with their own tools to make the jobs of working with data and training models easier:
+
+* SciKit has a https://scikit-learn.org/stable/related_projects.html[related projects page]
+* PyTorch has an https://landscape.pytorch.org/[entire ecosystem of supporting tools]
+* TensorFlow has https://www.tensorflow.org/resources/libraries-extensions[the same thing]
+
+The lower layers are libraries you will use to work with data, such as:
+
+* https://numpy.org/[NumPy]
+* https://pandas.pydata.org/[Pandas] (based on NumPy)
+* https://matplotlib.org/[Matplotlib] (for drawing simple graphs)
+
+Core Python data types and libraries are an even lower layer. A course such as https://www.redhat.com/en/services/training/ad141-red-hat-training-presents-introduction-to-python-programming[AD141] might help you speed up through this lowest layer.
+
+There will generally be some intermediate-level tools like:
+
+* https://scipy.org/[SciPy], based on NumPy, for more efficient data processing, adding some high-level functions
+* https://seaborn.pydata.org/[Seaborn], based on Matplotlib, for richer visualisation
+* https://plotly.com/python/[Plotly], another high-level visualisation library
+
+The higher layers involve job scheduling frameworks like:
+
+* https://www.ray.io/[Ray], infrastructure orchestration for distributed workloads
+* https://codeflare.dev/[CodeFlare], distributed serverless machine learning
+
+Additionally, building on top of pre-trained models:
+
+* https://huggingface.co/docs/transformers/index[Transformers], an LLM-oriented library of pre-trained models built on top of lower-level packages (TF, PyTorch)
+
+Frameworks for creating applications:
+
+* https://www.langchain.com/[LangChain], a framework for creating LLM-based applications
+* https://github.com/i-am-bee/beeai-framework[Bee Agent Framework], a framework to build applications based on AI agents (Agentic AI) that can make decisions and perform tasks autonomously
+
+There will then be special-purpose libraries, such as:
+
+* https://github.com/dmlc/xgboost[XGBoost], a multi-language regularising gradient-boosting library
+* https://lightgbm.readthedocs.io/en/stable/[LightGBM], another gradient boosting framework
+
+MLOps is another can of worms:
+
+* https://www.kubeflow.org/[KubeFlow] for Kubernetes-related integrations (included in RHOAI)
+* https://github.com/elyra-ai/elyra[Elyra], integrating with JupyterLab Notebooks
+
+Don't worry - start small and when you outgrow the sandbox, look at your project and listen to what sounds like the most interesting direction to go in at the moment, and then look around to see what tools you can learn about to expand.
+
+We all needed years to get our sense of direction in this story. There are no shortcuts, just fun along the way.
+
+=== Get Some Samples ===
+
+Have a look at some very simple datasets to start with.
+
+A couple of great types of models to start learning with are regression (prediction) and classification (shape recognition, text analysis).
+
+The data you need for those is typically very different. Try figuring out why and what kind of models a certain type of data supports well.
+
+Nowadays, https://www.kaggle.com/datasets[Kaggle] has some great example datasets (requires a free account).
+
+* https://www.nist.gov/el/ammt-temps/datasets[NIST] has two excellent image classification datasets: handwritten numbers and fashion items - they are a great start for classification - almost every framework includes them. Both are also available at Kaggle - https://www.kaggle.com/datasets/hojjatk/mnist-dataset[numbers] and https://www.kaggle.com/datasets/zalando-research/fashionmnist[fashion].
+* https://casas.wsu.edu/datasets/[CASAS] has a _Human Activity Recognition from Continuous Ambient Sensor Data_ dataset - it is a very flexible regression dataset offering tons of opportunities (available for https://www.kaggle.com/datasets/utkarshx27/ambient-sensor-based-human-activity-recognition[download from Kaggle]).
