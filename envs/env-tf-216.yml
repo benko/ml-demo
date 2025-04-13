@@ -1,5 +1,5 @@
 ---
-name: tensorflow-2.16
+name: tf-216
 channels:
   - apple
   - conda-forge
@@ -8,6 +8,8 @@ dependencies:
   - numpy>=1.19.5
   - pandas>=1.1.5
   - matplotlib>=3.3.4
+  - seaborn>=0.9.0
+  - ipykernel>=6.29
   - tensorflow-deps
   - pip>=25.0
   - pip:
