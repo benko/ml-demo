@@ -233,7 +233,7 @@ If you want to later update some of the environment components, you can do so by
 (sklearn-16) $ *mamba env update -y -f ./env-sklearn-16.yml*
 ...
 ----
-+
+
 ====
 WARNING: Without the `-n` option, `env update` is always applied to _current_ environment.
 ====
