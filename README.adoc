@@ -25,4 +25,3 @@ The following files are available in this project:
 
 `wine-sklearn.ipynb`::
     The same as the above script, only using a JupyterLab notebook. Because you can be selective about which cells to run, nothing is commented out. You are free to re-run sections of the notebook as often as you want, but of course - provisions have to be made for prerequisites.
-
