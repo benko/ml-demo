@@ -49,9 +49,10 @@ Starting Jupyter will automatically open it in your browser.
 .JupyterLab Web Application
 image::images/jupyterlab-welcome.png[width="90%"]
 
+
 If you want to reopen it at any later point, you can point your browser to `\http://localhost:8888/lab` and it will reload the last state of the workbench before you closed it.
 
-There are a couple of additional options you can use, the two most convenient are listed below.
+There are a couple of additional startup options you can use, the two most convenient are listed below.
 
 * `--no-browser`, do not open a browser tab/window
 * `--notebook-dir=_path_`, where to load notebooks and kernels from
@@ -92,6 +93,27 @@ Installed kernelspec sklearn-16 in /foo/bar/baz/Jupyter/kernels/sklearn-16
 
 Do the same for the other environments.
 
+[subs="+quotes"]
+----
+(sklearn-16) $ *mamba activate pytorch-26*
+(pytorch-26) $ *pip install ipykernel*
+...
+(pytorch-26) $ *python -mipykernel install --user --name=pytorch-26*
+...
+
+(pytorch-26) $ *mamba activate tf-216*
+(tf-216) $ *pip install ipykernel*
+...
+(tf-216) $ *python -mipykernel install --user --name=tf-216*
+...
+----
+
 As you register additional kernels, you will see them show up in the JupyterLab web application.
 
+.JupyterLab With Installed Kernels
+image::images/jupyterlab-kernels.png[width="90%"]
+
 Once you open a notebook, you can select the kernel you need to run it with in the top-right corner menu.
+
+.Kernel Selection for a SciKit-Learn 1.6 Notebook
+image:images/jupyterlab-notebook.png[width="100%"]
