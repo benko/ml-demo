@@ -1,0 +1,257 @@
+== Testing InstructLab Models Locally ==
+
+=== What is InstructLab? ===
+
+There's a large variety of https://huggingface.co/models[models] available from https://huggingface.co[HuggingFace], and https://huggingface.co/instructlab[InstructLab] is an open-source collection of LLMs with tools that allow users to both use, and improve, LLMs based on Granite models.
+
+There are also model container images available on https://catalog.redhat.com/search?gs&q=granite%208b[Red Hat Ecosystem Catalog] (the link is just for the Granite 8b family).
+
+A https://developers.redhat.com/articles/2024/08/01/open-source-ai-coding-assistance-granite-models[Red Hat blog] by Cedric Clyburn shows how you can use Ollama and InstructLab to run LLMs locally in a lot more detail, so I'll keep it short and with a focus on Conda here.
+
+=== Setting Up the Environment ===
+
+You can use one of the provided environment files, `env-ilab-25.yml`, to create a Conda environment with the `instructlab` package version `0.25.x`.
+
+This gives you the basic environment that enables you to start serving and chatting to various HuggingFace (and other) Transformer-based models.
+
+Just like with any other Conda environment, start by creating the desired configuration.
+
+[subs="+quotes"]
+----
+$ *source conda-init.sh*
+
+(base) $ *mamba env create -y -f envs/env-ilab-25.yml*
+Channels:
+ - conda-forge
+Platform: osx-arm64
+Collecting package metadata (repodata.json): done
+Solving environment: done
+
+Downloading and Extracting Packages:
+...
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: done
+...
+----
+
+====
+NOTE: The installation uses `pip` to install `instructlab` as there are no Conda Forge packages for it. Be patient, it takes quite some time.
+====
+
+Activate the environment and create a `bash` completion file.
+
+[subs="+quotes"]
+----
+(base) $ *mamba activate ilab-25*
+
+(ilab-25) $ *_ILAB_COMPLETE=bash_source ilab > ilab.completion*
+
+(ilab-25) $ *source ilab.completion*
+----
+
+Check the system information.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *ilab system info*
+Platform:
+  sys.version: 3.11.12 | packaged by conda-forge | (main, Apr 10 2025, 22:18:52) [Clang 18.1.8 ]
+  sys.platform: darwin
+  os.name: posix
+  platform.release: 24.4.0
+  platform.machine: arm64
+  platform.node: foobar
+  platform.python_version: 3.11.12
+  platform.cpu_brand: Apple M1 Max
+  memory.total: 64.00 GB
+  memory.available: 25.36 GB
+  memory.used: 14.97 GB
+
+InstructLab:
+  instructlab.version: 0.25.0
+  ...
+
+Torch:
+  torch.version: 2.5.1
+  ...
+  __torch.backends.mps.is_built: True
+  torch.backends.mps.is_available: True__
+
+llama_cpp_python:
+  llama_cpp_python.version: 0.3.6
+  _llama_cpp_python.supports_gpu_offload: True_
+----
+
+The PyTorch `mps` and Llama `supports_gpu_offload` settings show that InstructLab is capable of using the M1 Max GPU for serving.
+
+=== Downloading Models ===
+
+Visit the InstructLab page and choose a model to download (for this demo, I selected `granite-3.0-8b-lab-community`).
+
+Use the `ilab model download` command to pull it.
+
+By default, models will be stored in `~/.cache/instructlab/models/`, unless you say otherwise with the `--model-dir` option to `ilab model` command.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *ilab model download -rp instructlab/granite-3.0-8b-lab-community*
+INFO 2025-04-14 13:29:59,724 instructlab.model.download:77: Downloading model from Hugging Face:
+    Model: instructlab/granite-3.0-8b-lab-community@main
+    Destination: /foo/bar/.cache/instructlab/models
+...
+INFO 2025-04-14 13:36:13,171 instructlab.model.download:288:
+ᕦ(òᴗóˇ)ᕤ instructlab/granite-3.0-8b-lab-community model download completed successfully! ᕦ(òᴗóˇ)ᕤ
+
+INFO 2025-04-14 13:36:13,171 instructlab.model.download:302: Available models (\`ilab model list`):
++------------------------------------------+...+---------+--------------------------+
+| Model Name                               |...| Size    | Absolute path            |
++------------------------------------------+...+---------+--------------------------+
+| instructlab/granite-3.0-8b-lab-community |...| 15.2 GB | .../models/instructlab   |
++------------------------------------------+...+---------+--------------------------+
+----
+
+====
+NOTE: LLMs are usually quite large (as the name suggests) so be patient and set aside sufficient amount of disk space. The above model is a total download of 17 GiB, so even on a fast link it takes a couple of minutes to download.
+====
+
+Note that the absolute path to model is a directory - if you look inside it, there will be a subdirectory containing the actual download.
+
+The format of the model is HuggingFace _safetensors_, which requires the https://github.com/vllm-project/vllm.git[vLLM] serving backend, and is not supported on macOS by default.
+
+From here on, there are two options: either install vLLM manually, or use `llama.cpp` to convert the model to GGUF.
+
+=== Installing vLLM on macOS ===
+
+If you used the InstructLab env file provided in this repo, you should already have `torch` and `torchvision` modules in the environment. If not, ensure they are available.
+
+First, clone Triton and install it.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *git clone https://github.com/triton-lang/triton.git*
+Cloning into 'triton'...
+...
+
+(ilab-25) $ *cd triton/python*
+
+(ilab-25) $ *pip install cmake*
+Collecting cmake
+...
+Successfully installed cmake-4.0.0
+
+(ilab-25) $ *pip install -e .*
+Obtaining file:///foo/bar/baz/triton/python
+...
+Successfully built triton
+Installing collected packages: triton
+Successfully installed triton-3.3.0+git32b42821
+
+(ilab-25) $ *cd ../..*
+(ilab-25) $ *rm -rf ./triton/*
+----
+
+Clone vLLM and build it.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *git clone https://github.com/vllm-project/vllm.git*
+Cloning into 'vllm'...
+...
+
+(ilab-25) $ *cd vllm*
+
+(ilab-25) $ *sed -i 's/^triton==3.2/triton==3.3/' requirements/requirements-cpu.txt
+(ilab-25) $ *pip install -e .*
+Obtaining file:///foo/bar/baz/vllm
+...
+Successfully built vllm
+Installing collected packages: vllm
+Successfully installed vllm-0.8.5.dev3+g7cbfc1094.d20250414
+
+(ilab-25) $ *cd ..*
+(ilab-25) $ *rm -rf ./vllm/*
+----
+
+=== Converting Models to GGUF ===
+
+You can use https://github.com/ggerganov/llama.cpp.git[`llama.cpp`] to convert models from HF, GGML, and LORA model formats to GGUF, which InstructLab can serve even on a Mac.
+
+Clone and build `llama.cpp`.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *git clone https://github.com/ggerganov/llama.cpp.git*
+Cloning into 'llama.cpp'...
+...
+
+(ilab-25) $ *cd llama.cpp*
+
+(ilab-25) $ *pip install --upgrade -r requirements.txt*
+Looking in indexes: https://pypi.org/simple, ...
+...
+Successfully installed aiohttp-3.9.5 ...
+----
+
+You can now use the various `convert_*.py` scripts. In our case, it would be HF (HuggingFace) to GGUF conversion.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *./convert_hf_to_gguf.py \*
+                *~/.cache/instructlab/models/instructlab/granite-3.0-8b-lab-community/ \*
+                *--outfile ~/.cache/instructlab/models/granite-3.0-8b-lab-community.gguf \*
+                *--outtype q8_0*
+INFO:hf-to-gguf:Loading model: granite-3.0-8b-lab-community
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+INFO:hf-to-gguf:Exporting model...
+INFO:hf-to-gguf:gguf: loading model weight map from 'model.safetensors.index.json'
+INFO:hf-to-gguf:gguf: loading model part 'model-00001-of-00004.safetensors'
+...
+INFO:hf-to-gguf:Model successfully exported to /foo/bar/.cache/instructlab/models/granite-3.0-8b-lab-community.gguf
+
+(ilab-25) $ ilab model list
++------------------------------------------+...+---------+---------------------------------------+
+| Model Name                               |...| Size    | Absolute path                         |
++------------------------------------------+...+---------+---------------------------------------+
+| instructlab/granite-3.0-8b-lab-community |...| 15.2 GB | .../instructlab                       |
+| granite-3.0-8b-lab-community.gguf        |...| 8.1 GB  | .../granite-3.0-8b-lab-community.gguf |
++------------------------------------------+...+---------+---------------------------------------+
+----
+
+Reference: https://github.com/ggml-org/llama.cpp/discussions/2948[Tutorial: How to convert HuggingFace model to GGUF format] on GitHub.
+
+=== Serving Models ===
+
+Start the model server.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *ilab model serve \*
+            *--model-path /foo/bar/.cache/instructlab/models/granite-3.0-8b-lab-community.gguf*
+INFO 2025-04-14 14:49:05,624 instructlab.model.serve_backend:79: Setting backend_type in the serve config to llama-cpp
+INFO 2025-04-14 14:49:05,633 instructlab.model.serve_backend:85: Using model '/foo/bar/.cache/instructlab/models/granite-3.0-8b-lab-community.gguf' with -1 gpu-layers and 4096 max context size.
+...
+INFO 2025-04-14 14:49:12,050 instructlab.model.backends.llama_cpp:233: Starting server process, press CTRL+C to shutdown server...
+INFO 2025-04-14 14:49:12,050 instructlab.model.backends.llama_cpp:234: After application startup complete see http://127.0.0.1:8000/docs for API.
+----
+
+In another terminal, start a chat.
+
+[subs="+quotes"]
+----
+(ilab-25) $ *ilab model chat*
+╭─────────────────────────────────────── system ────────────────────────────────────────╮
+│ Welcome to InstructLab Chat w/ GRANITE-3.0-8B-LAB-COMMUNITY.GGUF (type /h for help)   │
+╰───────────────────────────────────────────────────────────────────────────────────────╯
+>>> *what are your specialties?*
+My specialties include providing assistance with general tasks such as setting up a new device, troubleshooting software issues, and answering basic questions about using technology.
+
+I can also help with more specific tasks related to Linux, such as configuring network settings, managing users and groups, and installing software packages. I have experience working with various Linux distributions, including Red Hat Enterprise Linux, Fedora, Ubuntu, and Debian.
+
+Additionally, I am familiar with a wide range of programming languages, tools, and frameworks, including Python, Java, C++, Ruby on Rails, AngularJS, React, and Node.js.
+
+I hope this information is helpful! Let me know if you have any other questions.
+----
+
+Congratulations!
