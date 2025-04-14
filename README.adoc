@@ -8,6 +8,9 @@ These are the docs:
 * link:docs/GETTING_RUNNING.adoc[Getting Running]: how to set up your Conda environments so you can start playing
 * link:docs/JUPYTERLAB.adoc[JupyterLab]: modify your base Conda env to run JupyterLab and easily execute notebooks in other envs
 
+For fun:
+* link:docs/INSTRUCTLAB.adoc[InstructLab]: how to play with HuggingFace models from InstructLab
+
 == Magic Time ==
 
 https://www.kaggle.com/datasets/yasserh/wine-quality-dataset[Wine Quality Dataset] is a versatile dataset that can be used both as a classification or a regression data set.
