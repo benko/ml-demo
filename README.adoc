@@ -9,6 +9,7 @@ These are the docs:
 * link:docs/JUPYTERLAB.adoc[JupyterLab]: modify your base Conda env to run JupyterLab and easily execute notebooks in other envs
 
 For fun:
+
 * link:docs/INSTRUCTLAB.adoc[InstructLab]: how to play with HuggingFace models from InstructLab
 
 == Magic Time ==

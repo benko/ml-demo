@@ -55,7 +55,7 @@ If you want to reopen it at any later point, you can point your browser to `\htt
 There are a couple of additional startup options you can use, the two most convenient are listed below.
 
 * `--no-browser`, do not open a browser tab/window
-* `--notebook-dir=_path_`, where to load notebooks and kernels from
+* `--notebook-dir=_path_`, where to load notebooks from
 
 You can also control Jupyter server with the `jupyter-server` command.
 
@@ -63,7 +63,7 @@ You can also control Jupyter server with the `jupyter-server` command.
 ----
 (base) $ *jupyter-server list*
 Currently running servers:
-http://localhost:8888/?token=xxxx :: /foo/bar/machine-learning-local
+http://localhost:8888/?token=xxxx :: /foo/bar/ml-demo
 
 (base) $ *jupyter-server stop*
 [JupyterServerStopApp] Shutting down server on 8888...

@@ -4,7 +4,7 @@
 
 There's a large variety of https://huggingface.co/models[models] available from https://huggingface.co[HuggingFace], and https://huggingface.co/instructlab[InstructLab] is an open-source collection of LLMs with tools that allow users to both use, and improve, LLMs based on Granite models.
 
-There are also model container images available on https://catalog.redhat.com/search?gs&q=granite%208b[Red Hat Ecosystem Catalog] (the link is just for the Granite 8b family).
+There are also OCI model images available on https://catalog.redhat.com/search?gs&q=granite%208b[Red Hat Ecosystem Catalog] (the link is just for the Granite 8b family).
 
 A https://developers.redhat.com/articles/2024/08/01/open-source-ai-coding-assistance-granite-models[Red Hat blog] by Cedric Clyburn shows how you can use Ollama and InstructLab to run LLMs locally in a lot more detail, so I'll keep it short and with a focus on Conda here.
 
@@ -122,9 +122,13 @@ The format of the model is HuggingFace _safetensors_, which requires the https:/
 
 From here on, there are two options: either install vLLM manually, or use `llama.cpp` to convert the model to GGUF.
 
+Personally, I prefer the second option as it very often also results in a smaller model, and does not require too much manual hacking about. You can even have a separate Conda environment just for `llama.cpp`.
+
 === Installing vLLM on macOS ===
 
-If you used the InstructLab env file provided in this repo, you should already have `torch` and `torchvision` modules in the environment. If not, ensure they are available.
+If you used the InstructLab env file provided in this repo, you should already have `cmake`, `torch`, and `torchvision` modules in the environment. If not, ensure they are available.
+
+During the compilation, `pip` in particular may complain about some incompatibilities. Just ignore it.
 
 First, clone Triton and install it.
 
@@ -135,11 +139,6 @@ Cloning into 'triton'...
 ...
 
 (ilab-25) $ *cd triton/python*
-
-(ilab-25) $ *pip install cmake*
-Collecting cmake
-...
-Successfully installed cmake-4.0.0
 
 (ilab-25) $ *pip install -e .*
 Obtaining file:///foo/bar/baz/triton/python
@@ -152,6 +151,10 @@ Successfully installed triton-3.3.0+git32b42821
 (ilab-25) $ *rm -rf ./triton/*
 ----
 
+====
+NOTE: Triton compilation takes quite a long time and it appears to be doing nothing. Don't worry.
+====
+
 Clone vLLM and build it.
 
 [subs="+quotes"]
@@ -162,7 +165,7 @@ Cloning into 'vllm'...
 
 (ilab-25) $ *cd vllm*
 
-(ilab-25) $ *sed -i 's/^triton==3.2/triton==3.3/' requirements/requirements-cpu.txt
+(ilab-25) $ *sed -i 's/^triton==3.2/triton==3.3/' requirements/requirements-cpu.txt*
 (ilab-25) $ *pip install -e .*
 Obtaining file:///foo/bar/baz/vllm
 ...
@@ -173,6 +176,10 @@ Successfully installed vllm-0.8.5.dev3+g7cbfc1094.d20250414
 (ilab-25) $ *cd ..*
 (ilab-25) $ *rm -rf ./vllm/*
 ----
+
+====
+NOTE: vLLM 0.8.5 somehow imposes a restriction of maximum version of Triton being 3.2.0, which is not necessary.
+====
 
 References:
 
