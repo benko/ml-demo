@@ -132,7 +132,7 @@ dependencies:
 ----
 
 ====
-IMPORTANT: I suggest you initially use semantic version spec only for the components you really care about (such as Python and SciKit-Learn), and let Conda figure out the other component versions. After that, you can look at what is installed using `pip list installed` and update the versions in the environment file to reflect your system. This will ensure that repeated installations will use the same component versions, thus giving you predictable behaviour.
+IMPORTANT: I suggest you initially use semantic version spec only for the components you really care about (such as Python and SciKit-Learn), and let Conda figure out the other component versions. After that, you can look at what is installed using `pip list` and update the versions in the environment file to reflect your system. This will ensure that repeated installations will use the same component versions, thus giving you predictable behaviour.
 ====
 
 Now tell `mamba` (or `conda`) to create it:
