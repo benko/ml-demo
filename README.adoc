@@ -24,8 +24,12 @@ It has features using 11-dimension tensors describing a wine's chemical composit
 
 The following files are available in this project:
 
-`wine-sklearn.py`::
-    A SciKit-Learn script that loads data, splits it into training and testing subsets, normalizes the features and trains a _C-Support Vector Classification_ model called `SVC` in SKLearn. It then proceeds to visualise the efficiency of the model using a _confusion matrix_ and a heatmap. The idea is that the commented part, training of a modified SVC called NuSVC, which has an issue, would demonstrate how awkward it is to test and fix the script by constantly re-running it.
+`code/wine-sklearn.py`::
+    A SciKit-Learn script that loads data, splits it into training and testing subsets, normalizes the features and trains a _C-Support Vector Classification_ model called `SVC` in SKLearn. It then proceeds to visualise the efficiency of the model using a _confusion matrix_ and a heatmap. The idea is that the commented part, training of a modified SVC called NuSVC, which has an issue, would demonstrate how awkward it is to test and fix the script by constantly re-running it. Run this in `sklearn-16` environment, by executing `python3 ./code/wine-sklearn.py` from the top level directory.
 
-`wine-sklearn.ipynb`::
-    The same as the above script, only using a JupyterLab notebook. Because you can be selective about which cells to run, nothing is commented out. You are free to re-run sections of the notebook as often as you want, but of course - provisions have to be made for prerequisites.
+`code/wine-sklearn.ipynb`::
+    Starts the same as the above script, only using a JupyterLab notebook. Because you can be selective about which cells to run, nothing is commented out. You are free to re-run sections of the notebook as often as you want, but of course - provisions have to be made for prerequisites, blocks of code that either declare some variables or process their data in some way.
++
+In addition to fitting a `SVC` and a `NuSVC` classification models, it also shows how the Wine Quality Dataset can be used with regression by fitting a `SVR` model.
++
+Run the examples in this notebook after you enabled JupyterLab and added the kernels to the base environment. If you named your kernels differently, ensure you chose the correct one in the top-right corner after opening the notebook.
