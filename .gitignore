@@ -1,6 +1,6 @@
 .ipynb_checkpoints
 .*.sw?
 .DS_Store
-WineQT.csv
+WineQ*.csv
 conda-init.sh
 ilab.completion

@@ -16,7 +16,7 @@ For fun:
 
 https://www.kaggle.com/datasets/yasserh/wine-quality-dataset[Wine Quality Dataset] is a versatile dataset that can be used both as a classification or a regression data set.
 
-Download it from the above link and place it in the same directory as the other files, calling it `WineQT.csv`.
+Download it from the above link and place it at the top of this git repository, in the same directory as this file, calling it `WineQT.csv`.
 
 It has features using 11-dimension tensors describing a wine's chemical composition, with one integer label between 0 and 10 to express the rating the wine got.
 

@@ -1,0 +1,5 @@
+== Data Sources Used ==
+
+* Wine Quality, M Yasser H, https://www.kaggle.com/datasets/yasserh/wine-quality-dataset (CC0 Public Domain 1.0)
+
+* Wine Quality Data (Combined), Subhadeep Chakraborty, https://www.kaggle.com/datasets/subhajournal/wine-quality-data-combined (GNU Affero GPL 3.0)
