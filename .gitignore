@@ -2,5 +2,8 @@
 .*.sw?
 .DS_Store
 WineQ*.csv
-conda-init.sh
-ilab.completion
+/conda-init.sh
+/ilab.completion
+/SwarmUI
+/vllm
+*.code-workspace

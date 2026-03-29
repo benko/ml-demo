@@ -1,0 +1,156 @@
+== Install vLLM ==
+
+Use `envs/env-vllm.yml` to create a Miniforge env.
+
+    $ source conda-init.sh
+    (base) $ conda env create -f envs/env-vllm.yml
+    ...
+
+Activate the vLLM environment.
+
+    (base) $ conda activate vllm
+    (vllm) $
+
+Install the dependencies.
+
+    (vllm) $ pip install --upgrade pip
+    ...
+    (vllm) $ pip install torch torchvision
+    ...
+
+Clone vLLM.
+
+    (vllm) $ git clone https://github.com/vllm-project/vllm.git
+
+Build it.
+
+    (vllm) $ cd vllm
+    (vllm) $ pip install -e .
+    ...
+
+Done!
+
+== Test With a Model ==
+
+Download a model, such as https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct[meta-llama/Llama-3.1-8B-Instruct], and run it.
+
+    (vllm) $ hf download meta-llama/Llama-3.1-8B-Instruct
+    ...
+
+    (vllm) $ python3
+    ...
+    >>> from vllm import LLM, SamplingParams
+    >>> import torch
+    >>> torch.backends.mps.is_available()
+    True
+    >>> llm = LLM(model="MODEL_PATH_OR_NAME",tensor_parallel_size=1,trust_remote_code=False,dtype="float16")
+    ...
+    INFO 03-29 15:00:00 [importing.py:68] Triton not installed or not compatible; certain GPU-related functions will not be available.
+    INFO 03-29 15:00:00 [model.py:549] Resolved architecture: LlamaForCausalLM
+    WARNING 03-29 15:00:00 [model.py:2016] Casting torch.bfloat16 to torch.float16.
+    INFO 03-29 15:00:00 [model.py:1678] Using max model len 131072
+    WARNING 03-29 15:00:00 [cpu.py:136] VLLM_CPU_KVCACHE_SPACE not set. Using 32.0 GiB for KV cache.
+    INFO 03-29 15:00:00 [scheduler.py:238] Chunked prefill is enabled with max_num_batched_tokens=4096.
+    INFO 03-29 15:00:00 [vllm.py:786] Asynchronous scheduling is enabled.
+    ...
+    (EngineCore pid=83442) INFO 03-29 15:00:05 [cpu_worker.py:109] Warning: NUMA is not enabled in this build. `init_cpu_threads_env` has no effect to setup thread affinity.
+    (EngineCore pid=83442) INFO 03-29 15:00:05 [parallel_state.py:1400] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://192.168.223.249:52310 backend=gloo
+    (EngineCore pid=83442) INFO 03-29 15:00:08 [parallel_state.py:1716] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank N/A, EPLB rank N/A
+    (EngineCore pid=83442) INFO 03-29 15:00:08 [cpu_model_runner.py:71] Starting to load model MODEL_PATH_OR_NAME...
+    Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+    Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:03<00:10,  3.60s/it]
+    Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:10<00:10,  5.44s/it]
+    Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:16<00:05,  5.65s/it]
+    Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:17<00:00,  4.10s/it]
+    Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:17<00:00,  4.49s/it]
+    (EngineCore pid=83442)
+    (EngineCore pid=83442) INFO 03-29 15:00:26 [default_loader.py:384] Loading weights took 17.97 seconds
+    (EngineCore pid=83442) INFO 03-29 15:00:26 [kv_cache_utils.py:1319] GPU KV cache size: 262,144 tokens
+    (EngineCore pid=83442) INFO 03-29 15:00:26 [kv_cache_utils.py:1324] Maximum concurrency for 131,072 tokens per request: 2.00x
+    (EngineCore pid=83442) INFO 03-29 15:00:31 [cpu_model_runner.py:82] Warming up model for the compilation...
+    (EngineCore pid=83442) INFO 03-29 15:01:02 [decorators.py:640] saved AOT compiled function to .../.cache/vllm/torch_compile_cache/torch_aot_compile/36db133f7a06cf0d1706adf64d0b95f254e21249fbbb1a84fadaf605c9b6d09f/rank_0_0/model
+    (EngineCore pid=83442) INFO 03-29 15:01:14 [monitor.py:76] Initial profiling/warmup run took 12.29 s
+    (EngineCore pid=83442) INFO 03-29 15:01:14 [cpu_model_runner.py:92] Warming up done.
+    (EngineCore pid=83442) INFO 03-29 15:01:14 [core.py:283] init engine (profile, create kv cache, warmup model) took 47.40 seconds
+    (EngineCore pid=83442) INFO 03-29 15:01:15 [vllm.py:786] Asynchronous scheduling is disabled.
+    (EngineCore pid=83442) WARNING 03-29 15:01:15 [vllm.py:855] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+    (EngineCore pid=83442) WARNING 03-29 15:01:15 [cpu.py:136] VLLM_CPU_KVCACHE_SPACE not set. Using 32.0 GiB for KV cache.
+    >>>
+
+MODEL_PATH_OR_NAME is either something like:
+
+* `/Users/johndoe/.cache/huggingface/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659/` if it is a path, or
+* `meta-llama/Llama-3.1-8B-Instruct` if it is a name
+
+Configure sampling and ask a question.
+
+    >>> sampling_params = SamplingParams(temperature=0.7, top_p=0.95, max_tokens=100)
+    >>> prompt = "You are a helpful assistant from the 18th century England. Respond using appropriate language. Introduce the topic of medieval castle design in five sentences."
+    >>> outputs = llm.generate([prompt], sampling_params)
+    Rendering prompts: 100%|...| 1/1 [00:00<00:00, 17.47it/s]
+    Processed prompts: 100%|...| 1/1 [00:21<00:00, 21.17s/it, est. speed input: 1.46 toks/s, output: 4.72 toks/s]
+    >>> for output in outputs:
+    ...     print(output.outputs[0].text)
+    ...
+    Good morrow to thee, kind sir or madam! I am at thy service. 'Tis a grand pleasure to converse with one such as thyself. I daresay, we find ourselves in the midst of a most fascinating discussion, one that touches upon the grand structures of old - the medieval castles. The designs of these fortified strongholds, as they stood sentinel over the land, were a testament to the ingenuity and craftsmanship of their builders, who strove to create
+
+    >>> exit()
+    (EngineCore pid=83442) INFO 03-29 15:07:38 [core.py:1210] Shutdown initiated (timeout=0)
+    (EngineCore pid=83442) INFO 03-29 15:07:38 [core.py:1233] Shutdown complete
+
+Serve the model.
+
+    (vllm) $ python -m vllm.entrypoints.api_server \
+                    --model MODEL_PATH_OR_NAME \
+                    --tensor-parallel-size 1 \
+                    --host 0.0.0.0 \
+                    --port 8000 \
+                    --dtype float16
+    INFO 03-29 15:32:01 [api_server.py:129] vLLM API server version 0.18.1rc1.dev221+g43cc5138e
+    ...
+    INFO 03-29 15:32:01 [model.py:549] Resolved architecture: LlamaForCausalLM
+    WARNING 03-29 15:32:01 [model.py:2016] Casting torch.bfloat16 to torch.float16.
+    INFO 03-29 15:32:01 [model.py:1678] Using max model len 131072
+    WARNING 03-29 15:32:01 [cpu.py:136] VLLM_CPU_KVCACHE_SPACE not set. Using 32.0 GiB for KV cache.
+    INFO 03-29 15:32:01 [vllm.py:786] Asynchronous scheduling is enabled.
+    INFO 03-29 15:32:01 [importing.py:68] Triton not installed or not compatible; certain GPU-related functions will not be available.
+    ...
+    (EngineCore pid=84256) INFO 03-29 15:32:06 [cpu_worker.py:109] Warning: NUMA is not enabled in this build. `init_cpu_threads_env` has no effect to setup thread affinity.
+    (EngineCore pid=84256) INFO 03-29 15:32:06 [parallel_state.py:1400] world_size=1 rank=0 local_rank=0 distributed_init_method=tcp://192.168.223.249:53531 backend=gloo
+    (EngineCore pid=84256) INFO 03-29 15:32:06 [parallel_state.py:1716] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, PCP rank 0, TP rank 0, EP rank N/A, EPLB rank N/A
+    (EngineCore pid=84256) INFO 03-29 15:32:06 [cpu_model_runner.py:71] Starting to load model /Users/johndoe/.cache/huggingface/hub/models--meta-llama--Llama-3.1-8B-Instruct/snapshots/0e9e39f249a16976918f6564b8830bc894c89659/...
+    Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+    Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:03<00:10,  3.45s/it]
+    Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:06<00:06,  3.48s/it]
+    Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:13<00:04,  4.80s/it]
+    Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:14<00:00,  3.37s/it]
+    Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:14<00:00,  3.63s/it]
+    (EngineCore pid=84256)
+    (EngineCore pid=84256) INFO 03-29 15:32:21 [default_loader.py:384] Loading weights took 14.52 seconds
+    (EngineCore pid=84256) INFO 03-29 15:32:21 [kv_cache_utils.py:1319] GPU KV cache size: 262,144 tokens
+    (EngineCore pid=84256) INFO 03-29 15:32:21 [kv_cache_utils.py:1324] Maximum concurrency for 131,072 tokens per request: 2.00x
+    (EngineCore pid=84256) INFO 03-29 15:32:25 [cpu_model_runner.py:82] Warming up model for the compilation...
+    (EngineCore pid=84256) INFO 03-29 15:32:32 [decorators.py:640] saved AOT compiled function to /Users/johndoe/.cache/vllm/torch_compile_cache/torch_aot_compile/2be6100cc84590c09dcb4ec4e92bd60957f53fa2bafccb2237b1ff596c6c8db7/rank_0_0/model
+    (EngineCore pid=84256) INFO 03-29 15:32:39 [monitor.py:76] Initial profiling/warmup run took 6.59 s
+    (EngineCore pid=84256) INFO 03-29 15:32:39 [cpu_model_runner.py:92] Warming up done.
+    (EngineCore pid=84256) INFO 03-29 15:32:39 [core.py:283] init engine (profile, create kv cache, warmup model) took 18.06 seconds
+    (EngineCore pid=84256) INFO 03-29 15:32:39 [vllm.py:786] Asynchronous scheduling is disabled.
+    (EngineCore pid=84256) WARNING 03-29 15:32:39 [vllm.py:855] Inductor compilation was disabled by user settings, optimizations settings that are only active during inductor compilation will be ignored.
+    (EngineCore pid=84256) WARNING 03-29 15:32:39 [cpu.py:136] VLLM_CPU_KVCACHE_SPACE not set. Using 32.0 GiB for KV cache.
+    INFO 03-29 15:32:39 [launcher.py:37] Available routes are:
+    INFO 03-29 15:32:39 [launcher.py:46] Route: /openapi.json, Methods: HEAD, GET
+    INFO 03-29 15:32:39 [launcher.py:46] Route: /docs, Methods: HEAD, GET
+    INFO 03-29 15:32:39 [launcher.py:46] Route: /docs/oauth2-redirect, Methods: HEAD, GET
+    INFO 03-29 15:32:39 [launcher.py:46] Route: /redoc, Methods: HEAD, GET
+    INFO 03-29 15:32:39 [launcher.py:46] Route: /health, Methods: GET
+    INFO 03-29 15:32:39 [launcher.py:46] Route: /generate, Methods: POST
+    INFO:     Started server process [84248]
+    INFO:     Waiting for application startup.
+    INFO:     Application startup complete.
+    INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+
+Interrogate it.
+
+    $ curl -XPOST -H "Content-Type: application/json" -d '{"prompt": "You are a helpful assistant from the 18th century England. Respond using appropriate language. Introduce the topic of medieval castle design in five sentences. Only respond once and do not repeat the answer.", "max_tokens": 1000, "temperature": 0.5}' http://localhost:8000/generate | jq
+
+
